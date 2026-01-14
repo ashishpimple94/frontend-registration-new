@@ -17,19 +17,24 @@ export const submitStudentRegistration = async (formDataObj) => {
     
     // Log what we're sending
     console.log('📋 Form data object keys:', Object.keys(formDataObj));
-    console.log('📋 firstName:', formDataObj.firstName);
-    console.log('📋 lastName:', formDataObj.lastName);
-    console.log('📋 email:', formDataObj.email);
-    console.log('📋 phone:', formDataObj.phone);
-    console.log('📋 guardianName:', formDataObj.guardianName);
-    console.log('📋 guardianPhone:', formDataObj.guardianPhone);
+    console.log('📋 firstName:', formDataObj.firstName, 'type:', typeof formDataObj.firstName);
+    console.log('📋 lastName:', formDataObj.lastName, 'type:', typeof formDataObj.lastName);
+    console.log('📋 email:', formDataObj.email, 'type:', typeof formDataObj.email);
+    console.log('📋 phone:', formDataObj.phone, 'type:', typeof formDataObj.phone);
+    console.log('📋 guardianName:', formDataObj.guardianName, 'type:', typeof formDataObj.guardianName);
+    console.log('📋 guardianPhone:', formDataObj.guardianPhone, 'type:', typeof formDataObj.guardianPhone);
     
     // Append all fields directly (flat structure for backend)
     Object.keys(formDataObj).forEach(key => {
       const value = formDataObj[key];
       
-      if (value === null || value === undefined || value === '') {
-        // Skip empty values
+      if (value === null || value === undefined) {
+        console.log(`⚠️ Skipping ${key}: null/undefined`);
+        return;
+      }
+      
+      if (value === '') {
+        console.log(`⚠️ Skipping ${key}: empty string`);
         return;
       }
       
@@ -44,16 +49,17 @@ export const submitStudentRegistration = async (formDataObj) => {
         });
       } else {
         // Append primitive values and files directly
+        console.log(`✅ Appending ${key}: ${typeof value === 'string' ? value.substring(0, 30) : '[File/Blob]'}`);
         formData.append(key, value);
       }
     });
     
-    console.log('📤 FormData entries being sent:');
+    console.log('📤 Final FormData entries being sent:');
     for (let [key, value] of formData.entries()) {
       if (typeof value === 'string') {
-        console.log(`  ${key}: "${value}"`);
+        console.log(`  ✅ ${key}: "${value}"`);
       } else {
-        console.log(`  ${key}: [File/Blob]`);
+        console.log(`  ✅ ${key}: [File/Blob]`);
       }
     }
     
@@ -65,6 +71,7 @@ export const submitStudentRegistration = async (formDataObj) => {
     return response.data;
   } catch (error) {
     console.error('❌ API Error:', error);
+    console.error('❌ Error response:', error.response?.data);
     throw error.response?.data || error.message;
   }
 };
