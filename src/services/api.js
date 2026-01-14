@@ -12,7 +12,7 @@ const API_BASE_URL = getApiBaseUrl();
 
 export const submitStudentRegistration = async (formData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/students/register`, formData, {
+    const response = await axios.post(`${API_BASE_URL}/student-registration`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
