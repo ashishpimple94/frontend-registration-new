@@ -15,6 +15,15 @@ export const submitStudentRegistration = async (formDataObj) => {
     // Convert object to FormData for multipart/form-data
     const formData = new FormData();
     
+    // Log what we're sending
+    console.log('📋 Form data object keys:', Object.keys(formDataObj));
+    console.log('📋 firstName:', formDataObj.firstName);
+    console.log('📋 lastName:', formDataObj.lastName);
+    console.log('📋 email:', formDataObj.email);
+    console.log('📋 phone:', formDataObj.phone);
+    console.log('📋 guardianName:', formDataObj.guardianName);
+    console.log('📋 guardianPhone:', formDataObj.guardianPhone);
+    
     // Append all fields directly (flat structure for backend)
     Object.keys(formDataObj).forEach(key => {
       const value = formDataObj[key];
@@ -26,7 +35,7 @@ export const submitStudentRegistration = async (formDataObj) => {
       
       // Handle nested objects (like address)
       if (typeof value === 'object' && !(value instanceof File) && !Array.isArray(value)) {
-        // Flatten address fields: address.street, address.city, etc.
+        // Flatten address fields: address[street], address[city], etc.
         Object.keys(value).forEach(nestedKey => {
           const nestedValue = value[nestedKey];
           if (nestedValue !== null && nestedValue !== undefined && nestedValue !== '') {
@@ -39,9 +48,13 @@ export const submitStudentRegistration = async (formDataObj) => {
       }
     });
     
-    console.log('📤 Sending FormData with fields:');
+    console.log('📤 FormData entries being sent:');
     for (let [key, value] of formData.entries()) {
-      console.log(`  ${key}: ${typeof value === 'string' ? value.substring(0, 50) : '[File]'}`);
+      if (typeof value === 'string') {
+        console.log(`  ${key}: "${value}"`);
+      } else {
+        console.log(`  ${key}: [File/Blob]`);
+      }
     }
     
     const response = await axios.post(`${API_BASE_URL}/student-registration`, formData, {
@@ -51,6 +64,7 @@ export const submitStudentRegistration = async (formDataObj) => {
     });
     return response.data;
   } catch (error) {
+    console.error('❌ API Error:', error);
     throw error.response?.data || error.message;
   }
 };
