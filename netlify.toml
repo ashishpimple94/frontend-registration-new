@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = "build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[env]
+  REACT_APP_API_BASE_URL = "https://hostel-management-backend-new-1.onrender.com/api"
