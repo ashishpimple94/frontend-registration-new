@@ -15,31 +15,29 @@ export const submitStudentRegistration = async (formDataObj) => {
     // Convert object to FormData for multipart/form-data
     const formData = new FormData();
     
-    // Flatten the object and append to FormData
-    const flattenObject = (obj, prefix = '') => {
-      Object.keys(obj).forEach(key => {
-        const value = obj[key];
-        const fullKey = prefix ? `${prefix}.${key}` : key;
-        
-        if (value === null || value === undefined || value === '') {
-          // Skip empty values
-          return;
-        } else if (typeof value === 'object' && !(value instanceof File) && !Array.isArray(value)) {
-          // Recursively flatten nested objects
-          flattenObject(value, fullKey);
-        } else if (Array.isArray(value)) {
-          // Handle arrays
-          value.forEach((item, index) => {
-            formData.append(`${fullKey}[${index}]`, item);
-          });
-        } else {
-          // Append primitive values and files
-          formData.append(fullKey, value);
-        }
-      });
-    };
-    
-    flattenObject(formDataObj);
+    // Append all fields directly (flat structure for backend)
+    Object.keys(formDataObj).forEach(key => {
+      const value = formDataObj[key];
+      
+      if (value === null || value === undefined || value === '') {
+        // Skip empty values
+        return;
+      }
+      
+      // Handle nested objects (like address)
+      if (typeof value === 'object' && !(value instanceof File) && !Array.isArray(value)) {
+        // Flatten address fields: address.street, address.city, etc.
+        Object.keys(value).forEach(nestedKey => {
+          const nestedValue = value[nestedKey];
+          if (nestedValue !== null && nestedValue !== undefined && nestedValue !== '') {
+            formData.append(`${key}[${nestedKey}]`, nestedValue);
+          }
+        });
+      } else {
+        // Append primitive values and files directly
+        formData.append(key, value);
+      }
+    });
     
     console.log('📤 Sending FormData with fields:');
     for (let [key, value] of formData.entries()) {
@@ -71,26 +69,24 @@ export const updateStudent = async (studentId, formDataObj) => {
     // Convert object to FormData for multipart/form-data
     const formData = new FormData();
     
-    const flattenObject = (obj, prefix = '') => {
-      Object.keys(obj).forEach(key => {
-        const value = obj[key];
-        const fullKey = prefix ? `${prefix}.${key}` : key;
-        
-        if (value === null || value === undefined || value === '') {
-          return;
-        } else if (typeof value === 'object' && !(value instanceof File) && !Array.isArray(value)) {
-          flattenObject(value, fullKey);
-        } else if (Array.isArray(value)) {
-          value.forEach((item, index) => {
-            formData.append(`${fullKey}[${index}]`, item);
-          });
-        } else {
-          formData.append(fullKey, value);
-        }
-      });
-    };
-    
-    flattenObject(formDataObj);
+    Object.keys(formDataObj).forEach(key => {
+      const value = formDataObj[key];
+      
+      if (value === null || value === undefined || value === '') {
+        return;
+      }
+      
+      if (typeof value === 'object' && !(value instanceof File) && !Array.isArray(value)) {
+        Object.keys(value).forEach(nestedKey => {
+          const nestedValue = value[nestedKey];
+          if (nestedValue !== null && nestedValue !== undefined && nestedValue !== '') {
+            formData.append(`${key}[${nestedKey}]`, nestedValue);
+          }
+        });
+      } else {
+        formData.append(key, value);
+      }
+    });
     
     const response = await axios.put(`${API_BASE_URL}/students/${studentId}`, formData, {
       headers: {
