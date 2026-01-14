@@ -15,18 +15,18 @@ export const submitStudentRegistration = async (formDataObj) => {
     // Convert object to FormData for multipart/form-data
     const formData = new FormData();
     
-    // Helper function to append nested objects
-    const appendFormData = (data, parentKey = '') => {
-      Object.keys(data).forEach(key => {
-        const value = data[key];
-        const fullKey = parentKey ? `${parentKey}[${key}]` : key;
+    // Flatten the object and append to FormData
+    const flattenObject = (obj, prefix = '') => {
+      Object.keys(obj).forEach(key => {
+        const value = obj[key];
+        const fullKey = prefix ? `${prefix}.${key}` : key;
         
-        if (value === null || value === undefined) {
-          // Skip null/undefined values
+        if (value === null || value === undefined || value === '') {
+          // Skip empty values
           return;
         } else if (typeof value === 'object' && !(value instanceof File) && !Array.isArray(value)) {
-          // Recursively handle nested objects (like address)
-          appendFormData(value, fullKey);
+          // Recursively flatten nested objects
+          flattenObject(value, fullKey);
         } else if (Array.isArray(value)) {
           // Handle arrays
           value.forEach((item, index) => {
@@ -39,7 +39,12 @@ export const submitStudentRegistration = async (formDataObj) => {
       });
     };
     
-    appendFormData(formDataObj);
+    flattenObject(formDataObj);
+    
+    console.log('📤 Sending FormData with fields:');
+    for (let [key, value] of formData.entries()) {
+      console.log(`  ${key}: ${typeof value === 'string' ? value.substring(0, 50) : '[File]'}`);
+    }
     
     const response = await axios.post(`${API_BASE_URL}/student-registration`, formData, {
       headers: {
@@ -66,15 +71,15 @@ export const updateStudent = async (studentId, formDataObj) => {
     // Convert object to FormData for multipart/form-data
     const formData = new FormData();
     
-    const appendFormData = (data, parentKey = '') => {
-      Object.keys(data).forEach(key => {
-        const value = data[key];
-        const fullKey = parentKey ? `${parentKey}[${key}]` : key;
+    const flattenObject = (obj, prefix = '') => {
+      Object.keys(obj).forEach(key => {
+        const value = obj[key];
+        const fullKey = prefix ? `${prefix}.${key}` : key;
         
-        if (value === null || value === undefined) {
+        if (value === null || value === undefined || value === '') {
           return;
         } else if (typeof value === 'object' && !(value instanceof File) && !Array.isArray(value)) {
-          appendFormData(value, fullKey);
+          flattenObject(value, fullKey);
         } else if (Array.isArray(value)) {
           value.forEach((item, index) => {
             formData.append(`${fullKey}[${index}]`, item);
@@ -85,7 +90,7 @@ export const updateStudent = async (studentId, formDataObj) => {
       });
     };
     
-    appendFormData(formDataObj);
+    flattenObject(formDataObj);
     
     const response = await axios.put(`${API_BASE_URL}/students/${studentId}`, formData, {
       headers: {
