@@ -10,109 +10,38 @@ const getApiBaseUrl = () => {
 
 const API_BASE_URL = getApiBaseUrl();
 
-export const submitStudentRegistration = async (formDataObj) => {
-  try {
-    // Convert object to FormData for multipart/form-data
-    const formData = new FormData();
-    
-    // Log what we're sending
-    console.log('📋 Form data object:', JSON.stringify(formDataObj, null, 2));
-    
-    // Append all fields directly (flat structure for backend)
-    Object.keys(formDataObj).forEach(key => {
-      const value = formDataObj[key];
-      
-      if (value === null || value === undefined) {
-        console.log(`⚠️ Skipping ${key}: null/undefined`);
-        return;
-      }
-      
-      if (value === '') {
-        console.log(`⚠️ Skipping ${key}: empty string`);
-        return;
-      }
-      
-      // Handle nested objects (like address)
-      if (typeof value === 'object' && !(value instanceof File) && !Array.isArray(value)) {
-        // Flatten address fields: address[street], address[city], etc.
-        Object.keys(value).forEach(nestedKey => {
-          const nestedValue = value[nestedKey];
-          if (nestedValue !== null && nestedValue !== undefined && nestedValue !== '') {
-            formData.append(`${key}[${nestedKey}]`, nestedValue);
-          }
-        });
-      } else {
-        // Append primitive values and files directly
-        console.log(`✅ Appending ${key}: ${typeof value === 'string' ? value.substring(0, 30) : '[File/Blob]'}`);
-        formData.append(key, value);
-      }
-    });
-    
-    console.log('📤 Final FormData entries being sent:');
-    for (let [key, value] of formData.entries()) {
-      if (typeof value === 'string') {
-        console.log(`  ✅ ${key}: "${value}"`);
-      } else {
-        console.log(`  ✅ ${key}: [File/Blob]`);
-      }
-    }
-    
-    console.log('🌐 Sending to:', `${API_BASE_URL}/student-registration`);
-    
-    const response = await axios.post(`${API_BASE_URL}/student-registration`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('❌ API Error:', error);
-    console.error('❌ Error response:', error.response?.data);
-    console.error('❌ Error status:', error.response?.status);
-    throw error.response?.data || error.message;
+// Create axios instance with proper config - MATCHING ADMIN PANEL
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 30000,
+  headers: {
+    'Content-Type': 'application/json'  // ✅ JSON, not FormData
   }
-};
+});
+
+// Add response interceptor for error handling
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (!error.response) {
+      error.message = 'Network error. Please check your internet connection.';
+    }
+    return Promise.reject(error);
+  }
+);
+
+// ✅ Send as JSON with nested objects preserved
+export const submitStudentRegistration = (data) => 
+  apiClient.post('/student-registration', data);
 
 export const getStudentById = async (studentId) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/students/${studentId}`);
+    const response = await apiClient.get(`/students/${studentId}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
   }
 };
 
-export const updateStudent = async (studentId, formDataObj) => {
-  try {
-    // Convert object to FormData for multipart/form-data
-    const formData = new FormData();
-    
-    Object.keys(formDataObj).forEach(key => {
-      const value = formDataObj[key];
-      
-      if (value === null || value === undefined || value === '') {
-        return;
-      }
-      
-      if (typeof value === 'object' && !(value instanceof File) && !Array.isArray(value)) {
-        Object.keys(value).forEach(nestedKey => {
-          const nestedValue = value[nestedKey];
-          if (nestedValue !== null && nestedValue !== undefined && nestedValue !== '') {
-            formData.append(`${key}[${nestedKey}]`, nestedValue);
-          }
-        });
-      } else {
-        formData.append(key, value);
-      }
-    });
-    
-    const response = await axios.put(`${API_BASE_URL}/students/${studentId}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error.message;
-  }
-};
+export const updateStudent = async (studentId, data) => 
+  apiClient.put(`/students/${studentId}`, data);
