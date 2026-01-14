@@ -526,6 +526,12 @@ const StudentRegistration = () => {
       // Use API service instead of direct axios call
       console.log('📤 Submitting registration...');
       console.log('Form Data:', submissionData);
+      console.log('Form Data Keys:', Object.keys(submissionData));
+      console.log('firstName in submissionData:', submissionData.firstName);
+      console.log('lastName in submissionData:', submissionData.lastName);
+      console.log('email in submissionData:', submissionData.email);
+      console.log('phone in submissionData:', submissionData.phone);
+      console.log('submissionData JSON:', JSON.stringify(submissionData, null, 2));
       
       let response;
       try {
