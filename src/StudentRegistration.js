@@ -376,7 +376,8 @@ const StudentRegistration = () => {
     setError('');
     setSuccess('');
 
-    // Validation
+    // Validation - TEMPORARILY DISABLED FOR DEBUGGING
+    /*
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
       const missing = [];
       if (!formData.firstName) missing.push('First Name');
@@ -408,6 +409,7 @@ const StudentRegistration = () => {
       isSubmittingRef.current = false; // Reset ref on validation error
       return;
     }
+    */
 
     if (!formData.admissionMonths || formData.admissionMonths < 1 || formData.admissionMonths > 12) {
       setError('Please enter a valid number of months (1-12)');
