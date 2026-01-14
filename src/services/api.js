@@ -16,13 +16,7 @@ export const submitStudentRegistration = async (formDataObj) => {
     const formData = new FormData();
     
     // Log what we're sending
-    console.log('📋 Form data object keys:', Object.keys(formDataObj));
-    console.log('📋 firstName:', formDataObj.firstName, 'type:', typeof formDataObj.firstName);
-    console.log('📋 lastName:', formDataObj.lastName, 'type:', typeof formDataObj.lastName);
-    console.log('📋 email:', formDataObj.email, 'type:', typeof formDataObj.email);
-    console.log('📋 phone:', formDataObj.phone, 'type:', typeof formDataObj.phone);
-    console.log('📋 guardianName:', formDataObj.guardianName, 'type:', typeof formDataObj.guardianName);
-    console.log('📋 guardianPhone:', formDataObj.guardianPhone, 'type:', typeof formDataObj.guardianPhone);
+    console.log('📋 Form data object:', JSON.stringify(formDataObj, null, 2));
     
     // Append all fields directly (flat structure for backend)
     Object.keys(formDataObj).forEach(key => {
@@ -63,6 +57,8 @@ export const submitStudentRegistration = async (formDataObj) => {
       }
     }
     
+    console.log('🌐 Sending to:', `${API_BASE_URL}/student-registration`);
+    
     const response = await axios.post(`${API_BASE_URL}/student-registration`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -72,6 +68,7 @@ export const submitStudentRegistration = async (formDataObj) => {
   } catch (error) {
     console.error('❌ API Error:', error);
     console.error('❌ Error response:', error.response?.data);
+    console.error('❌ Error status:', error.response?.status);
     throw error.response?.data || error.message;
   }
 };
