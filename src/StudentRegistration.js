@@ -244,6 +244,8 @@ const StudentRegistration = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
+    console.log('🔄 handleChange called:', { name, value, type, checked });
+    
     if (name.startsWith('address.')) {
       const addressField = name.split('.')[1];
       setFormData({
@@ -268,6 +270,8 @@ const StudentRegistration = () => {
         ...formData,
         [name]: name === 'semester' || name === 'advanceAmount' || name === 'admissionMonths' ? (value === '' ? (name === 'advanceAmount' ? 0 : 1) : parseInt(value) || (name === 'advanceAmount' ? 0 : 1)) : value
       });
+      
+      console.log('📝 Updated formData for field:', name, 'new value:', value);
       
       // Real-time email validation
       if (name === 'email' && value) {
