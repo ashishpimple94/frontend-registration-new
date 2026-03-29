@@ -29,9 +29,8 @@ const getApiBaseUrl = () => {
     return envUrl.endsWith('/api') ? envUrl : `${envUrl}/api`;
   }
   
-  // Always use Render backend URL (both development and production)
-  const renderBackendUrl = 'https://hostel-management-backend-new-1.onrender.com/api';
-  console.log('🌐 Using Render backend URL:', renderBackendUrl);
+  // Always use Hostinger backend URL
+  const renderBackendUrl = 'https://cyan-gorilla-353507.hostingersite.com/api';
   return renderBackendUrl;
 };
 

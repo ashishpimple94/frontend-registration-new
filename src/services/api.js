@@ -5,7 +5,7 @@ const getApiBaseUrl = () => {
   if (envUrl) {
     return envUrl.endsWith('/api') ? envUrl : `${envUrl}/api`;
   }
-  return 'https://hostel-management-backend-new-1.onrender.com/api';
+  return 'https://cyan-gorilla-353507.hostingersite.com/api';
 };
 
 const API_BASE_URL = getApiBaseUrl();
